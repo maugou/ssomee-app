@@ -12,6 +12,8 @@ import {
 import Config from 'react-native-config';
 import { useNavigation } from '@react-navigation/native';
 
+import { getPriceWithComma } from '../common/constant';
+
 interface Props {}
 
 type Data = {
@@ -53,10 +55,6 @@ const getAllProducts = async (productsPage: number) => {
   return data;
 };
 
-const getPriceWithComma = (price: number) => {
-  return new Intl.NumberFormat().format(price);
-};
-
 export const ProductList: React.FC<Props> = () => {
   const [products, setProducts] = useState<Products[]>([]);
   const [isRefresh, setIsRefresh] = useState(false);
@@ -79,7 +77,7 @@ export const ProductList: React.FC<Props> = () => {
   };
 
   const getMoreProducts = useCallback(async () => {
-    if (maxPage !== productsPage) {
+    if (maxPage <= productsPage) {
       setIsLoading(true);
 
       const data = await getAllProducts(productsPage);

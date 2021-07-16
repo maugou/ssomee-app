@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, FlatList, Image, StyleSheet } from 'react-native';
+import {
+  SafeAreaView,
+  FlatList,
+  Image,
+  StyleSheet,
+  Dimensions,
+  Text,
+  View,
+} from 'react-native';
 import Config from 'react-native-config';
 
 interface Props {}
@@ -19,7 +27,31 @@ export const ProductList: React.FC<Props> = () => {
   };
 
   const renderItem = useCallback(({ item }) => {
-    return <Image style={styles.mainImage} source={{ uri: item.mainImage }} />;
+    const { mainImage, name, originalPrice, ssomeePrice, soldOut } = item;
+
+    const getPriceWithComma = (price: number) => {
+      return new Intl.NumberFormat().format(price);
+    };
+
+    return (
+      <View style={styles.productBox}>
+        <Image style={styles.mainImage} source={{ uri: mainImage }} />
+
+        <Text style={styles.productName} numberOfLines={2}>
+          {name}
+        </Text>
+
+        {originalPrice !== ssomeePrice && (
+          <Text style={styles.originalPrice}>
+            {getPriceWithComma(originalPrice)}
+          </Text>
+        )}
+
+        <Text style={styles.ssomeePrice}>{getPriceWithComma(ssomeePrice)}</Text>
+
+        {soldOut && <Text style={styles.soldOut}>Sold Out</Text>}
+      </View>
+    );
   }, []);
 
   const keyEctractor = (item: {}, index: number) => `${index}`;
@@ -37,12 +69,44 @@ export const ProductList: React.FC<Props> = () => {
   );
 };
 
+const deviceWidth = Dimensions.get('window').width;
+const productWidth = deviceWidth / 2.4;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  productBox: {
+    flexDirection: 'column',
+    margin: (deviceWidth / 2 - productWidth) / 2,
+  },
   mainImage: {
-    width: 100,
-    height: 100,
+    width: productWidth,
+    height: productWidth,
+    borderWidth: 1,
+    borderColor: 'rgb(220, 220, 220)',
+  },
+  productName: {
+    width: productWidth,
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+  originalPrice: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textDecorationLine: 'line-through',
+    color: 'rgb(170, 170, 170)',
+  },
+  ssomeePrice: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  soldOut: {
+    position: 'absolute',
+    backgroundColor: 'rgb(110, 110, 110)',
+    color: 'rgb(255, 255, 255)',
+    padding: 3,
+    top: 5,
+    right: 5,
   },
 });

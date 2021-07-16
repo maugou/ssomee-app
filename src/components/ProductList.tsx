@@ -7,31 +7,98 @@ import {
   Dimensions,
   Text,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import Config from 'react-native-config';
 
 interface Props {}
 
+type Data = {
+  category: {};
+  products: Products[];
+  maxPage: number;
+  productCount: number;
+};
+
+type Products = {
+  prefix: string;
+  mainImage: string;
+  name: string;
+  productUrl: string;
+  brand: {};
+  orgininalPrice: number;
+  ssomeePrice: number;
+  soldOut: boolean;
+};
+
+const getAllProducts = async (productsPage: number) => {
+  let data: Data = {
+    category: {},
+    products: [],
+    maxPage: 0,
+    productCount: 0,
+  };
+
+  try {
+    const res = await fetch(
+      `${Config.API_URL}/products/all/${productsPage}?order=date-desc`
+    );
+
+    data = await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(data);
+  return data;
+};
+
+const getPriceWithComma = (price: number) => {
+  return new Intl.NumberFormat().format(price);
+};
+
 export const ProductList: React.FC<Props> = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Products[]>([]);
+  const [isRefresh, setIsRefresh] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [productsPage, setProductsPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(0);
 
   useEffect(() => {
-    getProducts();
+    refresh();
   }, []);
 
   const getProducts = async () => {
-    const res = await fetch(`${Config.API_URL}/products/all/1?order=date-desc`);
-    const data = await res.json();
+    const data = await getAllProducts(1);
+
+    setProductsPage(prevProductsPage => prevProductsPage + 1);
 
     setProducts(data.products);
   };
 
+  const getMoreProducts = useCallback(async () => {
+    if (maxPage !== productsPage) {
+      setIsLoading(true);
+
+      const data = await getAllProducts(productsPage);
+
+      setProductsPage(prevProductsPage => prevProductsPage + 1);
+      setMaxPage(data.maxPage);
+
+      setIsLoading(false);
+      setProducts(prevProducts => [...prevProducts, ...data.products]);
+    }
+  }, [maxPage, productsPage]);
+
+  const refresh = useCallback(async () => {
+    setIsRefresh(true);
+
+    await getProducts();
+
+    setIsRefresh(false);
+  }, []);
+
   const renderItem = useCallback(({ item }) => {
     const { mainImage, name, originalPrice, ssomeePrice, soldOut } = item;
-
-    const getPriceWithComma = (price: number) => {
-      return new Intl.NumberFormat().format(price);
-    };
 
     return (
       <View style={styles.productBox}>
@@ -54,7 +121,13 @@ export const ProductList: React.FC<Props> = () => {
     );
   }, []);
 
-  const keyEctractor = (item: {}, index: number) => `${index}`;
+  const keyEctractor = useCallback((item: {}, index: number) => `${index}`, []);
+
+  const ListFooterComponent = useCallback(() => {
+    return isLoading ? (
+      <ActivityIndicator size="large" color="rgb(70, 70, 70)" />
+    ) : null;
+  }, [isLoading]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,6 +137,12 @@ export const ProductList: React.FC<Props> = () => {
         renderItem={renderItem}
         keyExtractor={keyEctractor}
         numColumns={2}
+        onEndReachedThreshold={1}
+        onEndReached={getMoreProducts}
+        refreshing={isRefresh}
+        onRefresh={refresh}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={<ListFooterComponent />}
       />
     </SafeAreaView>
   );

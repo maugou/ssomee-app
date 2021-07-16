@@ -6,10 +6,11 @@ import {
   StyleSheet,
   Dimensions,
   Text,
-  View,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import Config from 'react-native-config';
+import { useNavigation } from '@react-navigation/native';
 
 interface Props {}
 
@@ -48,7 +49,7 @@ const getAllProducts = async (productsPage: number) => {
   } catch (error) {
     console.log(error);
   }
-  console.log(data);
+
   return data;
 };
 
@@ -62,6 +63,8 @@ export const ProductList: React.FC<Props> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [productsPage, setProductsPage] = useState(1);
   const [maxPage, setMaxPage] = useState(0);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     refresh();
@@ -98,10 +101,13 @@ export const ProductList: React.FC<Props> = () => {
   }, []);
 
   const renderItem = useCallback(({ item }) => {
-    const { mainImage, name, originalPrice, ssomeePrice, soldOut } = item;
+    const { mainImage, name, originalPrice, ssomeePrice, soldOut, prefix } =
+      item;
 
     return (
-      <View style={styles.productBox}>
+      <TouchableOpacity
+        style={styles.productBox}
+        onPress={() => navigation.navigate('ProductDetail', { prefix })}>
         <Image style={styles.mainImage} source={{ uri: mainImage }} />
 
         <Text style={styles.productName} numberOfLines={2}>
@@ -117,7 +123,7 @@ export const ProductList: React.FC<Props> = () => {
         <Text style={styles.ssomeePrice}>{getPriceWithComma(ssomeePrice)}</Text>
 
         {soldOut && <Text style={styles.soldOut}>Sold Out</Text>}
-      </View>
+      </TouchableOpacity>
     );
   }, []);
 
@@ -154,6 +160,7 @@ const productWidth = deviceWidth / 2.4;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'rgb(255, 255, 255)',
   },
   productBox: {
     flexDirection: 'column',

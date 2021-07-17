@@ -114,7 +114,6 @@
 				90F09B00C2442C24377E671B /* Pods-SsoMee-SsoMeeTests.debug.xcconfig */,
 				4516011799B9BAD7708130AE /* Pods-SsoMee-SsoMeeTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

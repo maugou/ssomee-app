@@ -18,6 +18,7 @@ import { isEmpty } from 'lodash';
 import { getPriceWithComma } from '../common/constant';
 import { getProductsDetail } from '../redux/thunk';
 import { RootState } from '../redux/store';
+import { addToCart } from '../redux/slice';
 
 interface Props {}
 
@@ -34,6 +35,10 @@ export const ProductDetail: React.FC<Props> = () => {
   useEffect(() => {
     dispatch(getProductsDetail(prefix));
   }, []);
+
+  const handleCart = () => {
+    dispatch(addToCart(prefix));
+  };
 
   const { mainImage, name, originalPrice, ssomeePrice } = product;
 
@@ -58,8 +63,8 @@ export const ProductDetail: React.FC<Props> = () => {
           <TouchableOpacity style={styles.orderButtonBox}>
             <Text style={styles.orderText}>구매하기</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.basketButtonBox}>
-            <Text style={styles.basketText}>장바구니</Text>
+          <TouchableOpacity style={styles.cartButtonBox} onPress={handleCart}>
+            <Text style={styles.cartText}>장바구니 담기</Text>
           </TouchableOpacity>
         </View>
 
@@ -111,14 +116,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  basketButtonBox: {
+  cartButtonBox: {
     padding: 10,
     marginVertical: 10,
     borderWidth: 1,
     borderColor: 'rgb(102, 051, 255)',
     width: deviceWidth / 3,
   },
-  basketText: {
+  cartText: {
     fontSize: 16,
     color: 'rgb(70, 70, 70)',
     fontWeight: 'bold',

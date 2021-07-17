@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
-import { getProducts } from './thunk';
+import { getProducts, getProductsDetail } from './thunk';
 
 type ProductState = {
   [k: string]: any;
@@ -13,10 +13,14 @@ const products = createSlice({
   initialState: initProducts,
   reducers: {},
   extraReducers: builder => {
-    builder.addCase(getProducts.fulfilled, (state, action) => ({
-      ...state,
-      ...action.payload.entities.products,
-    }));
+    builder
+      .addCase(getProducts.fulfilled, (state, action) => ({
+        ...state,
+        ...action.payload.entities.products,
+      }))
+      .addCase(getProductsDetail.fulfilled, (state, action) => {
+        state[action.payload.prefix] = action.payload;
+      });
   },
 });
 

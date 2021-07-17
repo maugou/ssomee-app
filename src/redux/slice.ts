@@ -45,12 +45,12 @@ const paginaion = createSlice({
   },
 });
 
-type ProductIdsState = string[];
-const initProductIds: ProductIdsState = [];
+type PrefixState = string[];
+const initIds: PrefixState = [];
 
 const productIds = createSlice({
   name: 'productIds',
-  initialState: initProductIds,
+  initialState: initIds,
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getProducts.fulfilled, (state, action) => {
@@ -61,8 +61,24 @@ const productIds = createSlice({
   },
 });
 
+const cart = createSlice({
+  name: 'cart',
+  initialState: initIds,
+  reducers: {
+    addToCart: (state, action) => {
+      state.push(action.payload);
+    },
+    removeFromCart: (state, action) => {
+      state.splice(action.payload, 1);
+    },
+  },
+});
+
+export const { addToCart, removeFromCart } = cart.actions;
+
 export const rootReducer = combineReducers({
   products: products.reducer,
   pagination: paginaion.reducer,
   productIds: productIds.reducer,
+  cart: cart.reducer,
 });

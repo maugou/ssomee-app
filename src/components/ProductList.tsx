@@ -123,7 +123,7 @@ export const ProductList: React.FC<Props> = () => {
         refreshing={isRefresh}
         onRefresh={refresh}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={<ListFooterComponent />}
+        ListFooterComponent={ListFooterComponent}
       />
     </SafeAreaView>
   );

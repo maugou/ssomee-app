@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,43 +11,33 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import Config from 'react-native-config';
+import { useDispatch, useSelector } from 'react-redux';
 import RenderHtml from 'react-native-render-html';
 import { isEmpty } from 'lodash';
 
 import { getPriceWithComma } from '../common/constant';
+import { getProductsDetail } from '../redux/thunk';
+import { RootState } from '../redux/store';
 
 interface Props {}
 
-type DetailData = {
-  mainImage: string;
-  name: string;
-  originalPrice: number;
-  ssomeePrice: number;
-  description: string;
-};
-
 export const ProductDetail: React.FC<Props> = () => {
-  const [productDetail, setProductDetail] = useState<DetailData>({});
-
   const route = useRoute();
+  const { prefix } = route.params;
+  const dispatch = useDispatch();
+
+  const product = useSelector((store: RootState) => store.products[prefix]);
+  const description = useSelector(
+    (store: RootState) => store.products[prefix].description
+  );
 
   useEffect(() => {
-    getProductsDetail();
+    dispatch(getProductsDetail(prefix));
   }, []);
 
-  const getProductsDetail = async () => {
-    const res = await fetch(
-      `${Config.API_URL}/products/${route.params!.prefix}`
-    );
-    const data = await res.json();
-    setProductDetail(data);
-  };
+  const { mainImage, name, originalPrice, ssomeePrice } = product;
 
-  const { mainImage, name, originalPrice, ssomeePrice, description } =
-    productDetail;
-
-  return !isEmpty(productDetail) ? (
+  return !isEmpty(description) ? (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Image source={{ uri: mainImage }} style={styles.mainImage} />

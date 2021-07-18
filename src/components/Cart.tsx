@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { isEmpty } from 'lodash';
+import Modal from 'react-native-modal';
 
 import { getPriceWithComma } from '../common/constant';
 import { RootState } from '../redux/store';
@@ -21,6 +22,7 @@ import { purchaseProduct } from '../redux/thunk';
 
 export const Cart = () => {
   const [price, setPrice] = useState({ originalPrice: 0, ssomeePrice: 0 });
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -99,6 +101,7 @@ export const Cart = () => {
     await Promise.all(cart.map(prefix => dispatch(purchaseProduct(prefix))));
 
     dispatch(resetCart());
+    setModalVisible(true);
   };
 
   return (
@@ -138,6 +141,19 @@ export const Cart = () => {
           </TouchableOpacity>
         </>
       )}
+
+      <Modal isVisible={isModalVisible} style={styles.modalContainer}>
+        <View style={styles.modalTextBox}>
+          <Text style={styles.modalText}>구매 완료하였습니다.</Text>
+          <View style={styles.modalButtonBox}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}>
+              <Text>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -232,5 +248,33 @@ const styles = StyleSheet.create({
     color: 'rgb(255, 255, 255)',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  modalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalTextBox: {
+    width: deviceWidth / 1.6,
+    height: 160,
+    backgroundColor: 'rgb(240, 240, 240)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalText: {
+    flex: 1,
+    fontSize: 18,
+    paddingTop: 40,
+  },
+  modalButtonBox: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: deviceWidth / 1.6,
+    borderWidth: 0.3,
+  },
+  modalButton: {
+    marginHorizontal: 10,
+    padding: 16,
+    paddingHorizontal: 30,
   },
 });

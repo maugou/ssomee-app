@@ -51,12 +51,16 @@ const initIds: PrefixState = [];
 const productIds = createSlice({
   name: 'productIds',
   initialState: initIds,
-  reducers: {},
+  reducers: {
+    resetProductIds: () => [],
+  },
   extraReducers: builder => {
     builder.addCase(getProducts.fulfilled, (state, action) => {
-      action.payload.result.products.forEach((prefix: string) =>
-        state.push(prefix)
-      );
+      action.payload.result.products.forEach((prefix: string) => {
+        if (!state.includes(prefix)) {
+          state.push(prefix);
+        }
+      });
     });
   },
 });
@@ -74,6 +78,7 @@ const cart = createSlice({
   },
 });
 
+export const { resetProductIds } = productIds.actions;
 export const { addToCart, removeFromCart } = cart.actions;
 
 export const rootReducer = combineReducers({

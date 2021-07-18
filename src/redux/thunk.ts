@@ -8,10 +8,10 @@ const baseUrl = Config.API_URL;
 
 export const getProducts = createAsyncThunk(
   'products/all',
-  async (page: number, { rejectWithValue }) => {
+  async (arg: { page: number; order: string }, { rejectWithValue }) => {
     try {
       const res = await fetch(
-        `${baseUrl}/products/all/${page}?order=date-desc`
+        `${baseUrl}/products/all/${arg.page}?order=${arg.order}`
       );
       const productsData = await res.json();
 

@@ -104,9 +104,9 @@ export const ProductDetail: React.FC<Props> = () => {
               onPress={() => {
                 setModalVisible(false);
                 if (modalContent === '장바구니') {
-                  navigation.navigate('Cart');
+                  navigation.navigate('장바구니');
                 } else {
-                  navigation.navigate('PurchaseList');
+                  navigation.navigate('구매내역');
                 }
               }}>
               <Text>확인</Text>

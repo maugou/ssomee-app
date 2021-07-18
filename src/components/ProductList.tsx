@@ -8,6 +8,7 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,21 +19,11 @@ import { RootState } from '../redux/store';
 
 interface Props {}
 
-type Products = {
-  prefix: string;
-  mainImage: string;
-  name: string;
-  productUrl: string;
-  brand: {};
-  orgininalPrice: number;
-  ssomeePrice: number;
-  soldOut: boolean;
-};
-
 export const ProductList: React.FC<Props> = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [productsPage, setProductsPage] = useState(1);
+  const [searchText, setSearchText] = useState('');
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -104,17 +95,50 @@ export const ProductList: React.FC<Props> = () => {
 
   const keyEctractor = useCallback((item: {}, index: number) => `${index}`, []);
 
-  const ListFooterComponent = useCallback(() => {
+  const listFooterComponent = useCallback(() => {
     return isLoading ? (
       <ActivityIndicator size="large" color="rgb(70, 70, 70)" />
     ) : null;
   }, [isLoading]);
 
+  const searchProduct = ({
+    nativeEvent,
+  }: {
+    nativeEvent: { text: string };
+  }) => {
+    setSearchText(nativeEvent.text.toLowerCase());
+  };
+
+  const getSearchProductIds = () => {
+    const values = Object.values(products);
+
+    const searchRes = values.filter(value =>
+      value.name.toLowerCase().includes(searchText)
+    );
+
+    searchRes.sort((a, b) => {
+      return (
+        a.name.toLowerCase().indexOf(searchText) -
+        b.name.toLowerCase().indexOf(searchText)
+      );
+    });
+
+    const sortPrefix = searchRes.map(res => res.prefix);
+
+    return sortPrefix;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <TextInput
+        style={styles.searchBox}
+        returnKeyType="search"
+        placeholder="찾으시는 상품을 검색해보세요."
+        onSubmitEditing={searchProduct}
+      />
       <FlatList
         key={'1'}
-        data={productIds}
+        data={searchText ? getSearchProductIds() : productIds}
         renderItem={renderItem}
         keyExtractor={keyEctractor}
         numColumns={2}
@@ -123,7 +147,7 @@ export const ProductList: React.FC<Props> = () => {
         refreshing={isRefresh}
         onRefresh={refresh}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={ListFooterComponent}
+        ListFooterComponent={listFooterComponent}
       />
     </SafeAreaView>
   );
@@ -136,6 +160,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgb(255, 255, 255)',
+  },
+  searchBox: {
+    height: 40,
+    borderWidth: 0.5,
+    borderColor: 'rgb(170, 170, 170)',
+    margin: (deviceWidth / 2 - productWidth) / 2,
+    padding: 10,
   },
   productBox: {
     flexDirection: 'column',

@@ -54,9 +54,11 @@ const productIds = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getProducts.fulfilled, (state, action) => {
-      action.payload.result.products.forEach((prefix: string) =>
-        state.push(prefix)
-      );
+      action.payload.result.products.forEach((prefix: string) => {
+        if (!state.includes(prefix)) {
+          state.push(prefix);
+        }
+      });
     });
   },
 });

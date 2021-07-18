@@ -98,5 +98,5 @@ export const rootReducer = combineReducers({
   pagination: paginaion.reducer,
   productIds: productIds.reducer,
   cart: cart.reducer,
-  purchaseProducts: purchaseList.reducer,
+  purchaseList: purchaseList.reducer,
 });

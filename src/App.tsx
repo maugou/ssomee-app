@@ -29,7 +29,7 @@ const BottomTabRoute = () => {
         }}
       />
       <BottomTab.Screen
-        name="Cart"
+        name="장바구니"
         component={Cart}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -38,7 +38,7 @@ const BottomTabRoute = () => {
         }}
       />
       <BottomTab.Screen
-        name="PurchaseList"
+        name="구매내역"
         component={PurchaseList}
         options={{
           tabBarIcon: ({ color, size }) => (

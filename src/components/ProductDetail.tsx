@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,18 +14,24 @@ import { useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import RenderHtml from 'react-native-render-html';
 import { isEmpty } from 'lodash';
+import Modal from 'react-native-modal';
+import { useNavigation } from '@react-navigation/native';
 
 import { getPriceWithComma } from '../common/constant';
-import { getProductsDetail } from '../redux/thunk';
+import { getProductsDetail, purchaseProduct } from '../redux/thunk';
 import { RootState } from '../redux/store';
 import { addToCart } from '../redux/slice';
 
 interface Props {}
 
 export const ProductDetail: React.FC<Props> = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState('');
+
   const route = useRoute();
   const { prefix } = route.params;
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const product = useSelector((store: RootState) => store.products[prefix]);
   const description = useSelector(
@@ -38,6 +44,16 @@ export const ProductDetail: React.FC<Props> = () => {
 
   const handleCart = () => {
     dispatch(addToCart(prefix));
+
+    setModalVisible(true);
+    setModalContent('장바구니');
+  };
+
+  const handleOrder = () => {
+    dispatch(purchaseProduct(prefix));
+
+    setModalVisible(true);
+    setModalContent('구매내역');
   };
 
   const { mainImage, name, originalPrice, ssomeePrice } = product;
@@ -60,7 +76,7 @@ export const ProductDetail: React.FC<Props> = () => {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.orderButtonBox}>
+          <TouchableOpacity style={styles.orderButtonBox} onPress={handleOrder}>
             <Text style={styles.orderText}>구매하기</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cartButtonBox} onPress={handleCart}>
@@ -70,6 +86,34 @@ export const ProductDetail: React.FC<Props> = () => {
 
         <RenderHtml contentWidth={deviceWidth} source={{ html: description }} />
       </ScrollView>
+
+      <Modal isVisible={isModalVisible} style={styles.modalContainer}>
+        <View style={styles.modalTextBox}>
+          <Text style={styles.modalText}>
+            [{modalContent}] 확인하시겠습니까?
+          </Text>
+          <View style={styles.modalButtonBox}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}>
+              <Text>취소</Text>
+            </TouchableOpacity>
+            <Text>|</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setModalVisible(false);
+                if (modalContent === '장바구니') {
+                  navigation.navigate('Cart');
+                } else {
+                  navigation.navigate('PurchaseList');
+                }
+              }}>
+              <Text>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   ) : (
     <ActivityIndicator
@@ -147,5 +191,33 @@ const styles = StyleSheet.create({
   },
   loading: {
     ...StyleSheet.absoluteFill,
+  },
+  modalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalTextBox: {
+    width: deviceWidth / 1.6,
+    height: 160,
+    backgroundColor: 'rgb(240, 240, 240)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalText: {
+    flex: 1,
+    fontSize: 18,
+    paddingTop: 40,
+  },
+  modalButtonBox: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: deviceWidth / 1.6,
+    borderWidth: 0.3,
+  },
+  modalButton: {
+    marginHorizontal: 10,
+    padding: 16,
+    paddingHorizontal: 30,
   },
 });

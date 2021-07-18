@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
-import { getProducts, getProductsDetail } from './thunk';
+import { getProducts, getProductsDetail, purchaseProduct } from './thunk';
 
 type ProductState = {
   [k: string]: any;
@@ -75,15 +75,28 @@ const cart = createSlice({
     removeFromCart: (state, action) => {
       state.splice(action.payload, 1);
     },
+    resetCart: () => [],
+  },
+});
+
+const purchaseList = createSlice({
+  name: 'purchaseProduct',
+  initialState: initIds,
+  reducers: {},
+  extraReducers: builder => {
+    builder.addCase(purchaseProduct.fulfilled, (state, action) => {
+      state.push(action.payload);
+    });
   },
 });
 
 export const { resetProductIds } = productIds.actions;
-export const { addToCart, removeFromCart } = cart.actions;
+export const { addToCart, removeFromCart, resetCart } = cart.actions;
 
 export const rootReducer = combineReducers({
   products: products.reducer,
   pagination: paginaion.reducer,
   productIds: productIds.reducer,
   cart: cart.reducer,
+  purchaseList: purchaseList.reducer,
 });

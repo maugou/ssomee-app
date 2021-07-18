@@ -46,3 +46,23 @@ export const getProductsDetail = createAsyncThunk(
     }
   }
 );
+
+export const purchaseProduct = createAsyncThunk(
+  'products/purchase',
+  async (prefix: string, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${baseUrl}/products/${prefix}`, {
+        method: 'POST',
+      });
+      const result = await res.json();
+
+      if (!result.success) {
+        throw 'purchaseProduct: error';
+      }
+
+      return prefix;
+    } catch {
+      return rejectWithValue({});
+    }
+  }
+);

@@ -10,6 +10,7 @@ import { store } from './redux/store';
 import { ProductList } from './components/ProductList';
 import { ProductDetail } from './components/ProductDetail';
 import { Cart } from './components/Cart';
+import { PurchaseList } from './components/PurchaseList';
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -28,11 +29,20 @@ const BottomTabRoute = () => {
         }}
       />
       <BottomTab.Screen
-        name="장바구니"
+        name="Cart"
         component={Cart}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="cart-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="PurchaseList"
+        component={PurchaseList}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="receipt-outline" color={color} size={size} />
           ),
         }}
       />

@@ -12,11 +12,12 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { isEmpty } from 'lodash';
 
 import { getPriceWithComma } from '../common/constant';
 import { RootState } from '../redux/store';
-import { removeFromCart } from '../redux/slice';
-import { isEmpty } from 'lodash';
+import { removeFromCart, resetCart } from '../redux/slice';
+import { purchaseProduct } from '../redux/thunk';
 
 export const Cart = () => {
   const [price, setPrice] = useState({ originalPrice: 0, ssomeePrice: 0 });
@@ -94,7 +95,12 @@ export const Cart = () => {
     return <View style={styles.divideLine} />;
   };
 
-  console.log(price);
+  const handleOrder = async () => {
+    await Promise.all(cart.map(prefix => dispatch(purchaseProduct(prefix))));
+
+    dispatch(resetCart());
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {cart.length === 0 ? (
@@ -127,7 +133,7 @@ export const Cart = () => {
               {getPriceWithComma(price.ssomeePrice)} 원
             </Text>
           </View>
-          <TouchableOpacity style={styles.orderButton}>
+          <TouchableOpacity style={styles.orderButton} onPress={handleOrder}>
             <Text style={styles.orderText}>구매하기</Text>
           </TouchableOpacity>
         </>
